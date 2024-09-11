@@ -4,13 +4,13 @@
   "description": "the operator precedence table for C and C++",
   "icon": "images/op_icon.png",
   "version": "1.0.0",
-  "publisher": "KAJESPER",
+  "publisher": "KAJESPERWEI",
   "engines": {
     "vscode": "^1.80.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/KAJESPER/c-cpp-operator-precedence-helper"
+    "url": "https://github.com/KAJESPERWEI/c-cpp-operator-precedence-helper"
   },
   "categories": [
     "Programming Languages",
