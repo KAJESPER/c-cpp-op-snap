@@ -5,7 +5,7 @@
 ## Features
 - **Expression Breakdown**: OpSnap takes complex C/C++ expressions and breaks them into simpler forms, making code easier to read and maintain.
 - **Status Bar Integration**: Select one or more lines of expressions, and with a single click on the **OpSnap** button in the bottom-right corner of the status bar, see the parsed result displayed in the output window.
-- **Operator Precedence Lookup**: Quickly access the complete C/C++ operator precedence list by typing `>c_cpp_op_snap` in the VSCode command palette.
+- **Operator Precedence Lookup**: Quickly access the complete C/C++ operator precedence list by typing `c_cpp_op_snap` in the VSCode command palette.
 
 
 ## Installation
@@ -26,7 +26,7 @@ Alternatively, you can install the extension from a `.vsix` file by opening the 
 
 2. **Operator Precedence List**:
    - Open the command palette by pressing `Ctrl+Shift+P`.
-   - Type `c_cpp_op_snap` to instantly retrieve the full C/C++ operator precedence list.
+   - Type `c-cpp-op-snap` to instantly retrieve the full C/C++ operator precedence list.
 
 ## Contributing
 
