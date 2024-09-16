@@ -148,7 +148,10 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('c-cpp-op-snap.parseSelectedText', async () => {
             const editor = vscode.window.activeTextEditor;
 
-            if (!editor || (editor.document.languageId !== 'cpp' && editor.document.languageId !== 'c' && editor.document.languageId !== 'cuda' && editor.document.languageId !== 'arduino')) {
+            if (!editor || (editor.document.languageId !== 'cpp' &&
+                editor.document.languageId !== 'c' &&
+                editor.document.languageId !== 'cuda' &&
+                editor.document.languageId !== 'arduino')) {
                 return;
             }
 
