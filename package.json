@@ -1,16 +1,16 @@
 {
-  "name": "c-cpp-operator-precedence-helper",
-  "displayName": "C/C++ Operator Precedence",
-  "description": "the operator precedence table for C and C++",
+  "name": "c-cpp-op-snap",
+  "displayName": "C/C++ OpSnap",
+  "description": "simplifies C/C++ code by breaking down complex expressions.",
   "icon": "images/op_icon.png",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "publisher": "KAJESPERWEI",
   "engines": {
     "vscode": "^1.80.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/KAJESPERWEI/c-cpp-operator-precedence-helper"
+    "url": "https://github.com/KAJESPERWEI/c-cpp-op-snap"
   },
   "categories": [
     "Programming Languages",
@@ -21,9 +21,40 @@
   "contributes": {
     "commands": [
       {
-        "command": "c-cpp-operator-precedence-helper.table",
-        "title": "c-cpp-operator-precedence-helper"
+        "command": "c-cpp-op-snap.table",
+        "title": "c-cpp-op-snap"
       }
+    ],   "languages": [
+      {
+        "id": "cpp",
+        "extensions": [".cpp", ".cc", ".cxx", ".hpp", ".hh", ".hxx", ".inl", ".ipp"],
+        "aliases": ["C++", "cpp"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "c",
+        "extensions": [".c", ".h"],
+        "aliases": ["C"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "arduino",
+        "extensions": [".ino"],
+        "aliases": ["Arduino"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "cuda",
+        "extensions": [".cu", ".cuh"],
+        "aliases": ["CUDA"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "activationEvents": [
+      "onLanguage:cpp",
+      "onLanguage:c",
+      "onLanguage:arduino",
+      "onLanguage:cuda"
     ]
   },
   "scripts": {

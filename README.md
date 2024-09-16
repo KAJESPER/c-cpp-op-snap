@@ -1,35 +1,36 @@
-# c-cpp-operator-precedence-helper README
+# OpSnap - A VSCode Extension for C/C++ Developers
 
-This Visual Studio Code extension provides C/C++ developers with a convenient, easily accessible table of operator precedence. It helps developers quickly reference operator precedence rules without having to search through documentation or external resources, improving coding efficiency and reducing errors related to operator misunderstanding.
+**OpSnap** is a powerful tool designed for C/C++ developers to simplify complex expressions by breaking them down into manageable components. It helps enhance code readability and understanding by transforming intricate expressions into simple ones with just two operands and an operator.
 
 ## Features
+- **Expression Breakdown**: OpSnap takes complex C/C++ expressions and breaks them into simpler forms, making code easier to read and maintain.
+- **Status Bar Integration**: Select one or more lines of expressions, and with a single click on the **OpSnap** button in the bottom-right corner of the status bar, see the parsed result displayed in the output window.
+- **Operator Precedence Lookup**: Quickly access the complete C/C++ operator precedence list by typing `>c_cpp_op_snap` in the VSCode command palette.
 
-- **Quick Access**: Instantly view the C/C++ operator precedence table directly within VSCode.
-- **Clear Visualization**: The table is structured for easy reading and understanding of operator priorities.
-- **Supports C and C++**: Designed specifically for both C and C++ developers.
-- **Non-intrusive**: The extension integrates seamlessly with your development workflow.
 
 ## Installation
 
 1. Open VSCode.
 2. Go to the Extensions Marketplace.
-3. Search for `c-cpp-operator-precedence-helper`.
+3. Search for `c-cpp-op-snap`.
 4. Click **Install**.
 
 Alternatively, you can install the extension from a `.vsix` file by opening the Command Palette (`Ctrl+Shift+P`), selecting `Install from VSIX...`, and choosing the `.vsix` file.
 
 ## Usage
 
-Once installed, you can access the operator precedence table:
+1. **Breaking Down Expressions**:
+   - Select a line or multiple lines of C/C++ expressions in your editor.
+   - Click the **OpSnap** button in the bottom-right corner of the status bar.
+   - The parsed results will be displayed in the output window.
 
-1. Open the Command Palette (`Ctrl+Shift+P`).
-2. Type `c-cpp-operator-precedence-helper` and select the command from the list.
-
-The table will be displayed in a new tab, allowing you to keep it open while writing or reviewing code.
+2. **Operator Precedence List**:
+   - Open the command palette by pressing `Ctrl+Shift+P`.
+   - Type `c_cpp_op_snap` to instantly retrieve the full C/C++ operator precedence list.
 
 ## Contributing
 
-Contributions are welcome! If you encounter bugs or have suggestions for improvements, feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/KAJESPERWEI/c-cpp-operator-precedence-helper).
+Contributions are welcome! If you encounter bugs or have suggestions for improvements, feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/KAJESPERWEI/c-cpp-op-snap).
 
 ## License
 

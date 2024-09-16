@@ -2,30 +2,133 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-// export function activate(context: vscode.ExtensionContext) {
+const operatorPrecedence: { [key: string]: number } = {
+    '||': 1, '&&': 2,
+    '|': 3, '^': 4, '&': 5,
+    '==': 6, '!=': 6, '<': 7, '>': 7, '<=': 7, '>=': 7,
+    '<<': 8, '>>': 8,
+    '+': 9, '-': 9,
+    '*': 10, '/': 10, '%': 10,
+    '=': 11, '+=': 11, '-=': 11, '*=': 11, '/=': 11, '%=': 11,
+    '<<=': 11, '>>=': 11, '&=': 11, '^=': 11, '|=': 11,
+    '!': 12, '~': 12, '++': 12, '--': 12,
+    '->': 13, '.': 13,
+    '?': 14, ':': 14
+};
 
-// 	// Use the console to output diagnostic information (console.log) and errors (console.error)
-// 	// This line of code will only be executed once when your extension is activated
-// 	console.log('Congratulations, your extension "c-cpp-operator-precedence-helper" is now active!');
+// 生成临时变量
+let tempCounter = 0;
+function generateTempVar(): string {
+    return `x${tempCounter++}`;
+}
 
-// 	// The command has been defined in the package.json file
-// 	// Now provide the implementation of the command with registerCommand
-// 	// The commandId parameter must match the command field in package.json
-// 	const disposable = vscode.commands.registerCommand('c-cpp-operator-precedence-helper.table', () => {
-// 		// The code you place here will be executed every time your command is executed
-// 		// Display a message box to the user
-// 		vscode.window.showInformationMessage('Hello World from C/C++ Operator Precedence!');
-// 	});
+// 查找最外层的操作符
+function findMainOperator(expression: string): [string, number] {
+    let minPrecedence = Infinity;
+    let mainOp = '';
+    let mainOpIndex = -1;
+    let parenCount = 0;
 
-// 	context.subscriptions.push(disposable);
-// }
+    for (let i = 0; i < expression.length; i++) {
+        const char = expression[i];
+
+        if (char === '(') {
+            parenCount++;
+        } else if (char === ')') {
+            parenCount--;
+        } else if (parenCount === 0) {
+            // 支持多字符操作符，如 `>>` 或 `<<`
+            const twoCharOp = expression.substring(i, i + 2);
+            if (operatorPrecedence[twoCharOp] !== undefined) {
+                if (operatorPrecedence[twoCharOp] <= minPrecedence) {
+                    minPrecedence = operatorPrecedence[twoCharOp];
+                    mainOp = twoCharOp;
+                    mainOpIndex = i;
+                }
+                i++;
+            } else if (operatorPrecedence[char] !== undefined) {
+                if (operatorPrecedence[char] <= minPrecedence) {
+                    minPrecedence = operatorPrecedence[char];
+                    mainOp = char;
+                    mainOpIndex = i;
+                }
+            }
+        }
+    }
+
+    return [mainOp, mainOpIndex];
+}
+
+// 递归拆解表达式
+function splitExpression(expression: string, steps: string[] = []): string {
+    expression = expression.trim();
+
+    // 如果是简单表达式，直接返回
+    if (!/[\+\-\*\/\%\&\|\^\!\<\>\=\~]/.test(expression)) {
+        return expression;
+    }
+
+    // 查找主操作符
+    const [mainOp, mainOpIndex] = findMainOperator(expression);
+    if (mainOpIndex === -1) {
+        if (expression.startsWith('(') && expression.endsWith(')')) {
+            return splitExpression(expression.slice(1, -1), steps);
+        }
+        return expression;
+    }
+
+    // 处理三元操作符
+    if (mainOp === '?') {
+        const leftExpr = expression.slice(0, mainOpIndex).trim();
+        const rest = expression.slice(mainOpIndex + 1).trim();
+        const colonIndex = rest.indexOf(':');
+        const trueExpr = rest.slice(0, colonIndex).trim();
+        const falseExpr = rest.slice(colonIndex + 1).trim();
+
+        const leftVar = splitExpression(leftExpr, steps);
+        const trueVar = splitExpression(trueExpr, steps);
+        const falseVar = splitExpression(falseExpr, steps);
+
+        const tempVar = generateTempVar();
+        steps.push(`${tempVar} = ${leftVar} ? ${trueVar} : ${falseVar}`);
+        return tempVar;
+    }
+
+    // 拆解左右表达式
+    const leftExpr = expression.slice(0, mainOpIndex).trim();
+    const rightExpr = expression.slice(mainOpIndex + mainOp.length).trim();
+
+    const leftVar = splitExpression(leftExpr, steps);
+    const rightVar = splitExpression(rightExpr, steps);
+
+    // 生成新的临时变量
+    const tempVar = generateTempVar();
+    steps.push(`${tempVar} = ${leftVar} ${mainOp} ${rightVar}`);
+
+    return tempVar;
+}
+
+// 主函数，用于拆解表达式并返回拆解步骤
+function processExpression(expression: string): string[] {
+    const steps: string[] = [];
+    splitExpression(expression, steps);
+    return steps;
+}
+
+
+function createStatusBarButton(context: vscode.ExtensionContext) {
+    const button = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+    button.text = '$(beaker) OpSnap'; // 自定义图标和文本
+    button.command = 'c-cpp-op-snap.parseSelectedText'; // 按钮点击时触发的命令
+    button.show();
+    context.subscriptions.push(button);
+}
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Congratulations, "c-cpp-operator-precedence-helper" is now active!');
+    //console.log('Congratulations, "c-cpp-op-snap" is now active!');
+    const outputChannel = vscode.window.createOutputChannel("C/C++ Operator Parser");
 
-	const disposable = vscode.commands.registerCommand('c-cpp-operator-precedence-helper.table', () => {
+	const disposable = vscode.commands.registerCommand('c-cpp-op-snap.table', () => {
 		const panel = vscode.window.createWebviewPanel(
 			'mainPage', // Identifies the type of the webview. Used internally
 			'C/C++ Operator Precedence', // Title of the panel displayed to the user
@@ -38,6 +141,43 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
+    createStatusBarButton(context);
+
+    // 注册命令处理
+    context.subscriptions.push(
+        vscode.commands.registerCommand('c-cpp-op-snap.parseSelectedText', async () => {
+            const editor = vscode.window.activeTextEditor;
+
+            if (!editor || (editor.document.languageId !== 'cpp' && editor.document.languageId !== 'c' && editor.document.languageId !== 'cuda' && editor.document.languageId !== 'arduino')) {
+                return;
+            }
+
+            // 获取选中的文本
+            const selection = editor.selection;
+            if (selection.isEmpty) return; // 如果没有选中内容，直接返回
+
+            const selectedText = editor.document.getText(selection).trim();
+
+            if (selectedText) {
+                // 解析选中的文本
+                const parsedSteps = processExpression(selectedText);
+
+                if (parsedSteps.length > 0) {
+                    tempCounter = 0;
+                    // 创建新编辑器文档
+                    //const newDoc = await vscode.workspace.openTextDocument({ content: parsedSteps.join('\n'), language: 'plaintext' });
+                    //vscode.window.showTextDocument(newDoc, vscode.ViewColumn.Beside);
+                    outputChannel.clear();
+                    outputChannel.show();
+                    parsedSteps.forEach(step => outputChannel.appendLine(step));
+                }
+            } else{
+                vscode.window.showErrorMessage('Please select a C/C++ expression to parse.');
+            }
+        })
+    );
+
+
 }
 
 function getWebviewContent() {
