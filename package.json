@@ -3,7 +3,7 @@
   "displayName": "C/C++ OpSnap",
   "description": "simplifies C/C++ code by breaking down complex expressions.",
   "icon": "images/op_icon.png",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "publisher": "KAJESPERWEI",
   "engines": {
     "vscode": "^1.80.0"

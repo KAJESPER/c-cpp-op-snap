@@ -128,19 +128,19 @@ export function activate(context: vscode.ExtensionContext) {
     //console.log('Congratulations, "c-cpp-op-snap" is now active!');
     const outputChannel = vscode.window.createOutputChannel("C/C++ Operator Parser");
 
-	const disposable = vscode.commands.registerCommand('c-cpp-op-snap.table', () => {
-		const panel = vscode.window.createWebviewPanel(
-			'mainPage', // Identifies the type of the webview. Used internally
-			'C/C++ Operator Precedence', // Title of the panel displayed to the user
-			vscode.ViewColumn.One, // Editor column to show the new webview panel in
-			{} // Webview options
-		);
+    const disposable = vscode.commands.registerCommand('c-cpp-op-snap.table', () => {
+        const panel = vscode.window.createWebviewPanel(
+            'mainPage', // Identifies the type of the webview. Used internally
+            'C/C++ Operator Precedence', // Title of the panel displayed to the user
+            vscode.ViewColumn.One, // Editor column to show the new webview panel in
+            {} // Webview options
+        );
 
-		// Set the HTML content for the webview
-		panel.webview.html = getWebviewContent();
-	});
+        // Set the HTML content for the webview
+        panel.webview.html = getWebviewContent();
+    });
 
-	context.subscriptions.push(disposable);
+    context.subscriptions.push(disposable);
     createStatusBarButton(context);
 
     // 注册命令处理
@@ -148,11 +148,17 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('c-cpp-op-snap.parseSelectedText', async () => {
             const editor = vscode.window.activeTextEditor;
 
-            if (!editor || (editor.document.languageId !== 'cpp' &&
-                editor.document.languageId !== 'c' &&
-                editor.document.languageId !== 'cuda' &&
-                editor.document.languageId !== 'arduino')) {
+            if (!editor) {
                 return;
+            } else {
+                if (editor.document.languageId !== 'cpp' &&
+                    editor.document.languageId !== 'c' &&
+                    editor.document.languageId !== 'cuda' &&
+                    editor.document.languageId !== 'cuda-cpp' &&
+                    editor.document.languageId !== 'arduino') {
+                    vscode.window.showErrorMessage(`Sorry, the language ID ${editor.document.languageId} isn't supported`);
+                    return;
+                }
             }
 
             // 获取选中的文本
@@ -174,7 +180,7 @@ export function activate(context: vscode.ExtensionContext) {
                     outputChannel.show();
                     parsedSteps.forEach(step => outputChannel.appendLine(step));
                 }
-            } else{
+            } else {
                 vscode.window.showErrorMessage('Please select a C/C++ expression to parse.');
             }
         })
@@ -184,7 +190,7 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 function getWebviewContent() {
-	return `
+    return `
         <!DOCTYPE html>
 <html lang="en">
 <head>
