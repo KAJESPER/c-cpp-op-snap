@@ -117,7 +117,7 @@ function processExpression(expression: string): string[] {
 
 
 function createStatusBarButton(context: vscode.ExtensionContext) {
-    const button = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+    const button = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     button.text = '$(beaker) OpSnap'; // 自定义图标和文本
     button.command = 'c-cpp-op-snap.parseSelectedText'; // 按钮点击时触发的命令
     button.show();
@@ -155,7 +155,15 @@ export function activate(context: vscode.ExtensionContext) {
                     editor.document.languageId !== 'c' &&
                     editor.document.languageId !== 'cuda' &&
                     editor.document.languageId !== 'cuda-cpp' &&
-                    editor.document.languageId !== 'arduino') {
+                    editor.document.languageId !== 'arduino' &&
+                    editor.document.languageId !== 'java' &&
+                    editor.document.languageId !== 'csharp' &&
+                    editor.document.languageId !== 'javascript' &&
+                    editor.document.languageId !== 'php' &&
+                    editor.document.languageId !== 'go' &&
+                    editor.document.languageId !== 'rust' &&
+                    editor.document.languageId !== 'swift' &&
+                    editor.document.languageId !== 'd') {
                     vscode.window.showErrorMessage(`Sorry, the language ID ${editor.document.languageId} isn't supported`);
                     return;
                 }
