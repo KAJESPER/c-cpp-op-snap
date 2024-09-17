@@ -37,8 +37,10 @@ function findMainOperator(expression: string): [string, number] {
         } else if (char === ')') {
             parenCount--;
         } else if (parenCount === 0) {
-            // 支持多字符操作符，如 `>>` 或 `<<`
             const twoCharOp = expression.substring(i, i + 2);
+            if (twoCharOp === '++' || twoCharOp === '--') {
+                return [twoCharOp, i];
+            }
             if (operatorPrecedence[twoCharOp] !== undefined) {
                 if (operatorPrecedence[twoCharOp] <= minPrecedence) {
                     minPrecedence = operatorPrecedence[twoCharOp];
@@ -59,16 +61,63 @@ function findMainOperator(expression: string): [string, number] {
     return [mainOp, mainOpIndex];
 }
 
+// 处理数组下标
+function handleArrayAccess(expression: string, steps: string[]): string {
+    let index = expression.indexOf('[');
+    if (index === -1) return expression;
+
+    let bracketCount = 0;
+    let closingIndex = -1;
+    for (let i = index; i < expression.length; i++) {
+        if (expression[i] === '[') {
+            bracketCount++;
+        } else if (expression[i] === ']') {
+            bracketCount--;
+            if (bracketCount === 0) {
+                closingIndex = i;
+                break;
+            }
+        }
+    }
+
+    if (closingIndex === -1) {
+        throw new Error('Unmatched brackets in the expression');
+    }
+
+    let leftPart = expression.slice(0, index).trim();
+    let indexExpr = expression.slice(index + 1, closingIndex).trim();
+    let remainingExpr = expression.slice(closingIndex + 1).trim();
+
+    const indexVar = splitExpression(indexExpr, steps);
+    const baseVar = splitExpression(leftPart, steps);
+
+    const tempVar = generateTempVar();
+    steps.push(`${tempVar} = ${baseVar}[${indexVar}]`);
+    remainingExpr = `${tempVar}` + remainingExpr;
+    if (remainingExpr.length > 0) {
+        return splitExpression(remainingExpr, steps);
+    }
+
+    return tempVar;
+}
+
 // 递归拆解表达式
 function splitExpression(expression: string, steps: string[] = []): string {
     expression = expression.trim();
 
-    // 如果是简单表达式，直接返回
+    // 去掉分号和逗号
+    expression = expression.replace(/[;,]/g, '');
+
+    // 处理数组下标
+    let result = handleArrayAccess(expression, steps);
+    if (result !== expression) {
+        return result;
+    }
+
     if (!/[\+\-\*\/\%\&\|\^\!\<\>\=\~]/.test(expression)) {
         return expression;
     }
 
-    // 查找主操作符
     const [mainOp, mainOpIndex] = findMainOperator(expression);
     if (mainOpIndex === -1) {
         if (expression.startsWith('(') && expression.endsWith(')')) {
@@ -77,7 +126,6 @@ function splitExpression(expression: string, steps: string[] = []): string {
         return expression;
     }
 
-    // 处理三元操作符
     if (mainOp === '?') {
         const leftExpr = expression.slice(0, mainOpIndex).trim();
         const rest = expression.slice(mainOpIndex + 1).trim();
@@ -94,14 +142,20 @@ function splitExpression(expression: string, steps: string[] = []): string {
         return tempVar;
     }
 
-    // 拆解左右表达式
+    if (mainOp === '++' || mainOp === '--') {
+        const targetVar = splitExpression(expression.slice(0, mainOpIndex), steps);
+        const tempVar = generateTempVar();
+        steps.push(`${tempVar} = ${targetVar}`);
+        steps.push(`i = i + 1`);  // 自增或自减操作在值使用之后执行
+        return tempVar;
+    }
+
     const leftExpr = expression.slice(0, mainOpIndex).trim();
     const rightExpr = expression.slice(mainOpIndex + mainOp.length).trim();
 
     const leftVar = splitExpression(leftExpr, steps);
     const rightVar = splitExpression(rightExpr, steps);
 
-    // 生成新的临时变量
     const tempVar = generateTempVar();
     steps.push(`${tempVar} = ${leftVar} ${mainOp} ${rightVar}`);
 
