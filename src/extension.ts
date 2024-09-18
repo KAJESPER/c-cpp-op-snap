@@ -11,10 +11,31 @@ const operatorPrecedence: { [key: string]: number } = {
     '*': 10, '/': 10, '%': 10,
     '=': 11, '+=': 11, '-=': 11, '*=': 11, '/=': 11, '%=': 11,
     '<<=': 11, '>>=': 11, '&=': 11, '^=': 11, '|=': 11,
-    '!': 12, '~': 12, '++': 12, '--': 12,
+    '!': 12, '~': 12, '++': 12, '--': 12,  
     '->': 13, '.': 13,
     '?': 14, ':': 14
 };
+
+const operators = ['++', '--', '==', '!=', '>=', '<=', '&&', '||', '+', '-', '*', '/', '%', '=', '>', '<', '&', '|', '^', '!'];
+
+function findLastOperatorIndex(expression: string): number {
+    let lastOperatorIndex = -1;
+    let lastOperatorLength = 1;
+
+    // 遍历字符串，从左到右找到最后的运算符
+    for (let i = 0; i < expression.length; i++) {
+        for (let operator of operators) {
+            // 检查当前字符及之后是否匹配运算符
+            if (expression.slice(i, i + operator.length) === operator) {
+                lastOperatorIndex = i; // 记录运算符的起始位置
+                lastOperatorLength = operator.length; // 记录运算符的长度
+            }
+        }
+    }
+
+    // 返回最后运算符的索引，如果找到的是多字符运算符，则返回其第一个字符的索引
+    return lastOperatorIndex;
+}
 
 // 生成临时变量
 let tempCounter = 0;
@@ -38,9 +59,9 @@ function findMainOperator(expression: string): [string, number] {
             parenCount--;
         } else if (parenCount === 0) {
             const twoCharOp = expression.substring(i, i + 2);
-            if (twoCharOp === '++' || twoCharOp === '--') {
-                return [twoCharOp, i];
-            }
+            // if (twoCharOp === '++' || twoCharOp === '--') {
+            //      return [twoCharOp, i];
+            //  }
             if (operatorPrecedence[twoCharOp] !== undefined) {
                 if (operatorPrecedence[twoCharOp] <= minPrecedence) {
                     minPrecedence = operatorPrecedence[twoCharOp];
@@ -89,11 +110,13 @@ function handleArrayAccess(expression: string, steps: string[]): string {
     let remainingExpr = expression.slice(closingIndex + 1).trim();
 
     const indexVar = splitExpression(indexExpr, steps);
-    const baseVar = splitExpression(leftPart, steps);
-
+    //const baseVar = splitExpression(leftPart, steps);
+    let leftLastOpIndex = findLastOperatorIndex(leftPart);
+    let leftRemainingExp = leftPart.slice(0, leftLastOpIndex+1).trim();
     const tempVar = generateTempVar();
+    const baseVar = splitExpression(leftPart.slice(leftLastOpIndex + 1,).trim(), steps);
     steps.push(`${tempVar} = ${baseVar}[${indexVar}]`);
-    remainingExpr = `${tempVar}` + remainingExpr;
+    remainingExpr = leftRemainingExp + `${tempVar}` + remainingExpr;
     if (remainingExpr.length > 0) {
         return splitExpression(remainingExpr, steps);
     }
@@ -146,7 +169,10 @@ function splitExpression(expression: string, steps: string[] = []): string {
         const targetVar = splitExpression(expression.slice(0, mainOpIndex), steps);
         const tempVar = generateTempVar();
         steps.push(`${tempVar} = ${targetVar}`);
-        steps.push(`i = i + 1`);  // 自增或自减操作在值使用之后执行
+        if (mainOp === '++') {
+        steps.push(`${targetVar} = ${targetVar} + 1`);}
+        else
+        { steps.push(`${targetVar} = ${targetVar} - 1`); } // 自增或自减操作在值使用之后执行
         return tempVar;
     }
 

@@ -1,3 +1,17 @@
+## 2.0.5 (2024-09-18)
+
+
+### Bug Fixes
+
+* the self-increasement parser failure ([ba05eb4](https://github.com/KAJESPERWEI/c-cpp-op-snap/commit/ba05eb4767d2f6317ae5d31421d4f3766ae95736))
+
+
+### Features
+
+* add support for array nest ([ee215f4](https://github.com/KAJESPERWEI/c-cpp-op-snap/commit/ee215f43614b777ca7f8341c2aa67e1a1ead92f6))
+
+
+
 ## 2.0.3 (2024-09-17)
 
 
