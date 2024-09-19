@@ -4,13 +4,13 @@
   "description": "simplifies C/C++ code by breaking down complex expressions.",
   "icon": "images/op_icon.png",
   "version": "2.0.5",
-  "publisher": "KAJESPERWEI",
+  "publisher": "KAJESPER",
   "engines": {
     "vscode": "^1.80.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/KAJESPERWEI/c-cpp-op-snap"
+    "url": "https://github.com/KAJESPER/c-cpp-op-snap"
   },
   "categories": [
     "Programming Languages",

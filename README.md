@@ -30,7 +30,7 @@ Alternatively, you can install the extension from a `.vsix` file by opening the 
 
 ## Contributing
 
-Contributions are welcome! If you encounter bugs or have suggestions for improvements, feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/KAJESPERWEI/c-cpp-op-snap).
+Contributions are welcome! If you encounter bugs or have suggestions for improvements, feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/KAJESPER/c-cpp-op-snap).
 
 ## License
 
