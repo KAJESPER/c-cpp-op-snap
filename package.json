@@ -3,8 +3,8 @@
   "displayName": "C/C++ OpSnap",
   "description": "simplifies C/C++ code by breaking down complex expressions.",
   "icon": "images/op_icon.png",
-  "version": "2.0.5",
-  "publisher": "KAJESPER",
+  "version": "3.0.0",
+  "publisher": "KAJESPERWEI",
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -21,32 +21,63 @@
   "contributes": {
     "commands": [
       {
-        "command": "c-cpp-op-snap.table",
-        "title": "c-cpp-op-snap"
+        "command": "c-cpp-op-snap.cTable",
+        "title": "Opsnap:C Operator Precedence"
+      },
+      {
+        "command": "c-cpp-op-snap.cppTable",
+        "title": "Opsnap:CPP Operator Precedence"
       }
-    ],   "languages": [
+    ],
+    "languages": [
       {
         "id": "cpp",
-        "extensions": [".cpp", ".cc", ".cxx", ".hpp", ".hh", ".hxx", ".inl", ".ipp"],
-        "aliases": ["C++", "cpp"],
+        "extensions": [
+          ".cpp",
+          ".cc",
+          ".cxx",
+          ".hpp",
+          ".hh",
+          ".hxx",
+          ".inl",
+          ".ipp"
+        ],
+        "aliases": [
+          "C++",
+          "cpp"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "c",
-        "extensions": [".c", ".h"],
-        "aliases": ["C"],
+        "extensions": [
+          ".c",
+          ".h"
+        ],
+        "aliases": [
+          "C"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "arduino",
-        "extensions": [".ino"],
-        "aliases": ["Arduino"],
+        "extensions": [
+          ".ino"
+        ],
+        "aliases": [
+          "Arduino"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "cuda",
-        "extensions": [".cu", ".cuh"],
-        "aliases": ["CUDA"],
+        "extensions": [
+          ".cu",
+          ".cuh"
+        ],
+        "aliases": [
+          "CUDA"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -66,20 +97,22 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   },
   "devDependencies": {
-    "@types/vscode": "^1.80.0",
     "@types/mocha": "^10.0.7",
     "@types/node": "20.x",
+    "@types/vscode": "^1.80.0",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.11.0",
-    "eslint": "^8.57.0",
-    "typescript": "^5.4.5",
-    "ts-loader": "^9.5.1",
-    "webpack": "^5.92.1",
-    "webpack-cli": "^5.1.4",
     "@vscode/test-cli": "^0.0.9",
-    "@vscode/test-electron": "^2.4.0"
+    "@vscode/test-electron": "^2.4.0",
+    "conventional-changelog-cli": "^5.0.0",
+    "eslint": "^8.57.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.92.1",
+    "webpack-cli": "^5.1.4"
   }
 }
