@@ -50,7 +50,7 @@ class ExpressionParser {
             if (this.isOperator(token)) {
                 numConsecutiveOp = numConsecutiveOp + 1;
                 if (token === '*') {
-                    if (numConsecutiveOp > 1 || operatorStack.length === 0) {
+                    if (numConsecutiveOp > 1 || outputStack.length === 0) {
                         outputStack.push('');
                         operatorStack.push("<deref>");
                         continue;

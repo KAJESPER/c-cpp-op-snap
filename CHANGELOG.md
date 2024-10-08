@@ -4,6 +4,22 @@
 ### Bug Fixes
 
 * change to author name ([eede27a](https://github.com/KAJESPER/c-cpp-op-snap/commit/eede27aa7f22448f6474a4c5a30520e9ccbc8eea))
+* sperate Multiplication and deref sign ([4f69f91](https://github.com/KAJESPER/c-cpp-op-snap/commit/4f69f9174e3f37a4796432c170c8e354332b7628))
+* the self-increasement parser failure ([971bb64](https://github.com/KAJESPER/c-cpp-op-snap/commit/971bb640be5703a1c9004e7798cb6b6e98e5f210))
+
+
+### Features
+
+* add support for array nest ([ee215f4](https://github.com/KAJESPER/c-cpp-op-snap/commit/ee215f43614b777ca7f8341c2aa67e1a1ead92f6))
+
+
+
+# 3.0.0 (2024-10-08)
+
+
+### Bug Fixes
+
+* change to author name ([eede27a](https://github.com/KAJESPER/c-cpp-op-snap/commit/eede27aa7f22448f6474a4c5a30520e9ccbc8eea))
 * the self-increasement parser failure ([971bb64](https://github.com/KAJESPER/c-cpp-op-snap/commit/971bb640be5703a1c9004e7798cb6b6e98e5f210))
 
 
