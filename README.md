@@ -23,10 +23,11 @@ Alternatively, you can install the extension from a `.vsix` file by opening the 
    - Select a line or multiple lines of C/C++ expressions in your editor.
    - Click the **OpSnap** button in the bottom-right corner of the status bar.
    - The parsed results will be displayed in the output window.
+   ![Watch Me](./images/watch_me.gif)
 
 2. **Operator Precedence List**:
    - Open the command palette by pressing `Ctrl+Shift+P`.
-   - Type `c-cpp-op-snap` to instantly retrieve the full C/C++ operator precedence list.
+   - Type `Opsnap` to instantly retrieve the full C/C++ operator precedence list.
 
 ## Contributing
 
