@@ -79,7 +79,6 @@ class ExpressionParser {
             add_op = '';
             if (this.isOperator(token)) {
                 numConsecutiveOp = numConsecutiveOp + 1;
-
                 if (numConsecutiveOp > 1 || (outputStack.length === 0)) {
                     if (this.isUnaryOperator(token)) {
                         outputStack.push('');
@@ -176,7 +175,8 @@ class ExpressionParser {
     }
 
     private tokenize(expression: string): string[] {
-        const regex = /\d+(\.\d+)?|[a-zA-Z_]\w*|==|!=|<=|>=|\+\+|--|->|&&|\|\||<<|>>|\+=|-=|\*=|\/=|%=|&=|\|=|\^=|<<=|>>=|::|\?|:|->\*|\*|\[|\]|\(|\)|{|}|\.|\+|-|\*|\/|%|&|\||\^|~|!|<|>|=|#/g;
+        //const regex = /\d+(\.\d+)?|[a-zA-Z_]\w*|==|!=|<=|>=|\+\+|--|->|&&|\|\||<<|>>|\+=|-=|\*=|\/=|%=|&=|\|=|\^=|<<=|>>=|::|\?|:|->\*|\*|\[|\]|\(|\)|{|}|\.|\+|-|\*|\/|%|&|\||\^|~|!|<|>|=|#/g;
+        const regex = /0[xX][\da-fA-F]+|\d+(\.\d+)?|[a-zA-Z_]\w*|==|!=|<=|>=|\+\+|--|->|&&|\|\||<<|>>|\+=|-=|\*=|\/=|%=|&=|\|=|\^=|<<=|>>=|::|\?|:|->\*|\*|\[|\]|\(|\)|{|}|\.|\+|-|\*|\/|%|&|\||\^|~|!|<|>|=|#/g;
         return expression.match(regex) || [];
     }
 }
