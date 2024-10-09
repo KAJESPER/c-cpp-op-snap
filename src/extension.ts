@@ -9,29 +9,59 @@ type Expression = { left: Operand; operator: string; right: Operand };
 var counter: number;
 counter = 0;
 class ExpressionParser {
-    private operators: Set<string> = new Set(["+", "-", "*", "/", "%", "&&", "||", "&", "|", "^", "<<", ">>", "==", "!=", "<", "<=", ">", ">=", "?", ":", "<type_cast>", "<deref>", ".", "->", "++", "--"]);
+    private operators: Set<string> = new Set(["+", "-", "*", "/", "%", "&&", "||", "<ref>", "|", "^", "<<", ">>", "==", "!=", "<", "<=", ">", ">=", "?", ":", "<type_cast>", "<deref>", ".", "->", "++", "--","~","!","&"]);
+    private unaryOperators: Set<string> = new Set(["&", "*", "+", "-", "++", "--", "~", "!"]);
+    private multiUseOperators: Map<string, string> = new Map([ 
+        ["&","<ref>"], 
+        ["*","<deref>"],
+        ["+","+"],
+        ["-","-"],
+        ["++","++"],
+        ["--","--"], 
+        ["~","~"],
+        ["!","!"]]);
     private precedence: Map<string, number> = new Map([
-        ["||", 1],
-        ["&&", 2],
-        ["|", 3],
-        ["^", 4],
-        ["&", 5],
-        ["==", 6], ["!=", 6],
-        ["<", 7], ["<=", 7], [">", 7], [">=", 7],
-        ["<<", 8], [">>", 8],
-        ["+", 9], ["-", 9],
-        ["*", 10], ["/", 10], ["%", 10],
-        ["?", 11], [":", 11], ["<deref>", 12], ["<type_cast>", 12], [".", 13], ["->", 13], ["++", 12], ["--", 12], ["::", 14]// ternary operators
+        ["||", 1],  // 逻辑或 (Logical OR)
+        ["&&", 2],  // 逻辑与 (Logical AND)
+        ["|", 3],   // 按位或 (Bitwise OR)
+        ["^", 4],   // 按位异或 (Bitwise XOR)
+        ["&", 5],   // 按位与 (Bitwise AND)
+        ["==", 6], ["!=", 6],  // 相等和不等运算符
+        ["<", 7], ["<=", 7], [">", 7], [">=", 7],  // 比较运算符
+        ["<<", 8], [">>", 8],  // 移位运算符
+        ["+", 9], ["-", 9],  // 加法和减法运算符
+        ["*", 10], ["/", 10], ["%", 10],  // 乘法、除法和取模运算符
+        ["?", 11], [":", 11],  // 三目运算符
+        ["<deref>", 12], ["<ref>", 12], ["<type_cast>", 12],  // 解引用和类型转换的单目运算符
+        ["~", 12],  // 按位取反运算符
+        ["!", 12],  // 逻辑非运算符
+        [".", 13], ["->", 13],  // 成员访问运算符
+        ["++", 12], ["--", 12],  // 自增和自减单目运算符
+        ["::", 14]  // 域解析运算符 (Scope Resolution Operator)
     ]);
 
     private isOperator(char: string): boolean {
         return this.operators.has(char);
     }
 
+    private isUnaryOperator(char: string): boolean {
+        return this.unaryOperators.has(char);
+    }
+
     private precedenceOf(op: string): number {
         return this.precedence.get(op) || 0;
     }
-
+    private translateMultiUsedOp(op: string): string {
+        const newOp = this.multiUseOperators.get(op);
+        if (typeof newOp !== "undefined")
+        {
+            return newOp;
+        }
+        else
+        {
+            return "";
+        }
+    }
     parse(expression: string): Expression[] {
         let outputStack: (string | Expression)[] = [];
         let operatorStack: string[] = [];
@@ -49,44 +79,31 @@ class ExpressionParser {
             add_op = '';
             if (this.isOperator(token)) {
                 numConsecutiveOp = numConsecutiveOp + 1;
-                if (token === '*') {
-                    if (numConsecutiveOp > 1 || outputStack.length === 0) {
+
+                if (numConsecutiveOp > 1 || (outputStack.length === 0)) {
+                    if (this.isUnaryOperator(token)) {
                         outputStack.push('');
-                        operatorStack.push("<deref>");
+                        operatorStack.push(this.translateMultiUsedOp(token));
                         continue;
-                    }
-                }
-                // reverse sign of the value case,liking "2*-a"
-                if (token === '-') {
-                    if (numConsecutiveOp > 1) {
-                        outputStack.push('');
-                        operatorStack.push("<Negtive>");
-                        continue;
-                    }
-                }
-                // self increasement
-                if (token === '++' || token === '--') {
-                    if (numConsecutiveOp > 1 || operatorStack.length === 0) {
-                        outputStack.push('');
-                        if (token === '++') {
-                            operatorStack.push("++");
-                        }
-                        else {
-                            operatorStack.push("--");
-                        }
                     }
                     else {
-                        const incValue = outputStack.pop() as Operand;
-                        outputStack.push(incValue);
-                        selfIncStack.push({ left: incValue, operator: token, right: "" });
+                        //error
                     }
+                }
+                //post self increasement.
+                if (token === "++" || token === "--") {
+                    const incValue = outputStack.pop() as Operand;
+                    outputStack.push(incValue);
+                    selfIncStack.push({ left: incValue, operator: token, right: "" });
+                    //for a+++b case
+                    numConsecutiveOp--;
                     continue;
                 }
                 while (
                     operatorStack.length &&
                     this.precedenceOf(operatorStack[operatorStack.length - 1]) >= this.precedenceOf(token)
                 ) {
-                    add_op = this.processOperator(outputStack, operatorStack.pop()!, token, numPushedOperands);
+                    this.processOperator(outputStack, operatorStack.pop()!);
                 }
                 operatorStack.push(token);
                 if (add_op !== '') {
@@ -100,9 +117,22 @@ class ExpressionParser {
                 let num_token_in_brackets: number;
                 numConsecutiveOp = 0;
                 num_token_in_brackets = numPushedOperands - numOperandSnap;
-
+                if (num_token_in_brackets === 1 && outputStack.length)
+                {
+                    let castType = "("+ outputStack.pop();
+                    while (operatorStack.length && operatorStack[operatorStack.length - 1] !== "(")
+                    {
+                        castType = castType + operatorStack.pop();
+                    }
+                    castType = castType + ")";
+                    outputStack.push(castType);
+                    add_op = "<type_cast>";
+                }
+                else
+                {
                 while (operatorStack.length && (operatorStack[operatorStack.length - 1] !== "(" && operatorStack[operatorStack.length - 1] !== "[")) {
-                    add_op = this.processOperator(outputStack, operatorStack.pop()!, token, num_token_in_brackets);
+                    this.processOperator(outputStack, operatorStack.pop()!);
+                }
                 }
                 // Remove '('
                 operatorStack.pop();
@@ -123,30 +153,15 @@ class ExpressionParser {
         }
 
         while (operatorStack.length) {
-            add_op = this.processOperator(outputStack, operatorStack.pop()!, 'clean', numPushedOperands);
-            if (add_op !== '') {
-                operatorStack.push(add_op);
-            }
+            this.processOperator(outputStack, operatorStack.pop()!);
         }
         // concat the self increasment stack with the output stack
         outputStack = outputStack.concat(selfIncStack);
         return outputStack as Expression[];
     }
 
-    private processOperator(outputStack: (string | Expression)[], operator: string, trigToken: string, num_token: number): string {
-        let addExtOp: string;
-        addExtOp = '';
-        // processing the single token in brackets
-        if (num_token === 1 && trigToken === ')' && operator === '*') {
-            let token = outputStack.pop() as Operand;
-            // pointer data type casting, merge '*' with data type which contained by token
-            if (typeof token === "string") {
-                token = token + operator;
-                outputStack.push(token);
-                addExtOp = "<type_cast>";
-            }
-        }
-        else if (operator === "?") {
+    private processOperator(outputStack: (string | Expression)[], operator: string) {
+        if (operator === "?") {
             const falseExpr = outputStack.pop() as Operand;
             const trueExpr = outputStack.pop() as Operand;
             const condition = outputStack.pop() as Operand;
@@ -158,7 +173,6 @@ class ExpressionParser {
             left = outputStack.pop() as Operand;
             outputStack.push({ left, operator, right });
         }
-        return addExtOp;
     }
 
     private tokenize(expression: string): string[] {
@@ -197,8 +211,6 @@ function processExpression(expression: string): string[] {
     result = parser.parse(expression);
     counter = -1;
     // construct the output string
-    // remove legacy "@"
-    result = result.filter(item => item !== "@");
     result.forEach((exp, index) => {
         expressionToString(exp, steps);
     });
